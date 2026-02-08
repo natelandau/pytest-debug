@@ -1,17 +1,24 @@
 [project]
     authors = [{ name = "Nathaniel Landau", email = "nate@natelandau.com" }]
     classifiers = [
+        "Framework :: Pytest",
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Developers",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",
         "Programming Language :: Python :: 3.14",
+        "Topic :: Software Development :: Testing",
     ]
     dependencies = ["pytest>=7.0", "rich>=14.3.2"]
-    description = "Add your description here"
+    description = "Pytest plugin providing debug fixtures, ANSI-stripped capsys, whitespace-visible assertions, and terminal column management"
     name = "pytest-devtools"
     readme = "README.md"
     requires-python = ">=3.11"
     version = "0.1.0"
+
+[project.entry-points.pytest11]
+    pytest-devtools = "devtools.plugin"
 
 [build-system]
     build-backend = "uv_build"
@@ -86,7 +93,7 @@
     line-length    = 100
     output-format  = "grouped"
     src            = ["src", "tests"]
-    target-version = "py313"
+    target-version = "py311"
     [tool.ruff.lint]
         ignore = [
             "ANN002", # Missing type annotation for `*args`
@@ -118,7 +125,7 @@
             "ARG001",  # Unused function argument
             "ARG002",  # Unused method argument
             "ARG005",  # Unused lambda argument
-            "D102",
+            "D",       # Docstring rules relaxed in tests
             "ERA001",  # Commented out code
             "F403",
             "F405",    # May be undefined from type imports

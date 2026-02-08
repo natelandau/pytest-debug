@@ -85,7 +85,7 @@ fail_fast                  = true
 
 [[repos]]
     hooks = [
-        { id = "pytest", name = "pytest", entry = "pytest tests/", language = "system", pass_filenames = false, files = '''
+        { id = "pytest", name = "pytest", entry = "uv run pytest tests/", language = "system", pass_filenames = false, files = '''
 (?x)^(
 src/|
 tests/|
@@ -96,7 +96,7 @@ pyproject\.toml
         { id = "shellcheck", name = "shellcheck", entry = "shellcheck --check-sourced --severity=warning", language = "system", types = [
             "shell",
         ] },
-        { id = "ty", name = "ty", entry = "ty check src/", exclude = "tests/|duties.py|scripts/", language = "system", types = [
+        { id = "ty", name = "ty", entry = "uv run ty check src/", exclude = "tests/|duties.py|scripts/", language = "system", types = [
             "python",
         ] },
     ]
