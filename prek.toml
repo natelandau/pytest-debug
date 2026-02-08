@@ -1,0 +1,103 @@
+default_install_hook_types = ["commit-msg", "pre-commit", "pre-push"]
+default_stages             = ["manual", "pre-commit"]
+fail_fast                  = true
+
+[[repos]]
+    hooks = [{ id = "commitizen" }, { id = "commitizen-branch", stages = ["pre-push"] }]
+    repo  = "https://github.com/commitizen-tools/commitizen"
+    rev   = "v4.13.5"
+
+[[repos]]
+    hooks = [
+        { id = "python-check-mock-methods" },
+        { id = "python-no-eval" },
+        { id = "python-no-log-warn" },
+        { id = "python-use-type-annotations" },
+        { id = "rst-backticks" },
+        { id = "rst-directive-colons" },
+        { id = "rst-inline-touching-normal" },
+        { id = "text-unicode-replacement-char" },
+    ]
+    repo = "https://github.com/pre-commit/pygrep-hooks"
+    rev = "v1.10.0"
+
+[[repos]]
+    hooks = [{ id = "check-json5", exclude = ".devcontainer/|.vscode/" }]
+    repo  = "https://gitlab.com/bmares/check-json5"
+    rev   = "v1.0.1"
+
+[[repos]]
+    hooks = [
+        { id = "check-added-large-files" },
+        { id = "check-ast" },
+        { id = "check-builtin-literals" },
+        { id = "check-case-conflict" },
+        { id = "check-docstring-first" },
+        { id = "check-merge-conflict" },
+        { id = "check-shebang-scripts-are-executable" },
+        { id = "check-symlinks" },
+        { id = "check-toml" },
+        { id = "check-vcs-permalinks" },
+        { id = "check-xml" },
+        { id = "check-yaml" },
+        { id = "debug-statements" },
+        { id = "detect-private-key" },
+        { id = "end-of-file-fixer", types = [
+            "python",
+        ] },
+        { id = "fix-byte-order-marker" },
+        { id = "mixed-line-ending" },
+        { id = "trailing-whitespace", types = [
+            "python",
+        ], args = [
+            "--markdown-linebreak-ext=md",
+        ] },
+    ]
+    repo = "https://github.com/pre-commit/pre-commit-hooks"
+    rev = "v6.0.0"
+
+[[repos]]
+    hooks = [
+        { id = "yamllint", files = '^.*\.(yaml|yml)$', entry = "yamllint --strict --config-file .yamllint.yml" },
+    ]
+    repo = "https://github.com/adrienverge/yamllint.git"
+    rev = "v1.38.0"
+
+[[repos]]
+    hooks = [{ id = "ruff-check" }, { id = "ruff-format", args = ["--check"] }]
+    repo  = "https://github.com/astral-sh/ruff-pre-commit"
+    rev   = "v0.15.0"
+
+[[repos]]
+    hooks = [{ id = "typos", args = ["--force-exclude"], stages = ["commit-msg", "pre-commit"] }]
+    repo  = "https://github.com/adhtruong/mirrors-typos"
+    rev   = "v1.43.2"
+
+[[repos]]
+    hooks = [{ id = "check-github-workflows", args = ["--verbose"] }]
+    repo  = "https://github.com/python-jsonschema/check-jsonschema"
+    rev   = "0.36.1"
+
+    # [[repos]]
+    #     hooks = [{ id = "sync-with-uv" }]
+    #     repo  = "https://github.com/tsvikas/sync-with-uv"
+    #     rev   = "v0.5.0"
+
+[[repos]]
+    hooks = [
+        { id = "pytest", name = "pytest", entry = "pytest tests/", language = "system", pass_filenames = false, files = '''
+(?x)^(
+src/|
+tests/|
+uv\.lock|
+pyproject\.toml
+)
+''' },
+        { id = "shellcheck", name = "shellcheck", entry = "shellcheck --check-sourced --severity=warning", language = "system", types = [
+            "shell",
+        ] },
+        { id = "ty", name = "ty", entry = "ty check src/", exclude = "tests/|duties.py|scripts/", language = "system", types = [
+            "python",
+        ] },
+    ]
+    repo = "local"
