@@ -62,6 +62,7 @@ uv run pytest tests/ -n0  # Run tests (use -n0 to disable xdist parallelism for 
 The following rule files contain project-specific instructions that MUST be read and followed. These rules are not optional - you MUST read each linked file and understand its contents before starting any work.
 
 -   [`.glue/rules/git-commit-message-rules.md`](.glue/rules/git-commit-message-rules.md) - Git commit message rules
+-   [`.glue/rules/git-global-rules.md`](.glue/rules/git-global-rules.md) - Global Git workflow rules
 -   [`.glue/rules/global-coding-standards.md`](.glue/rules/global-coding-standards.md) - Global coding style and standards
 -   [`.glue/rules/inline-comments-standards.md`](.glue/rules/inline-comments-standards.md) - How to write inline comments
 -   [`.glue/rules/python-packaging.md`](.glue/rules/python-packaging.md) - Python packaging standards

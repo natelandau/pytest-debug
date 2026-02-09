@@ -4,9 +4,9 @@
         "rule:git-commit-message-rules": {
             "type": "rule",
             "name": "git-commit-message-rules",
-            "installed_hash": "513bf0f85dbbf2aeaf2f1eb6f4cb004c",
-            "source_hash": "65ad3fd4ce76615ad6521c3545a46f5a",
-            "installed_at": "2026-02-08T16:07:35Z",
+            "installed_hash": "bfb30ad56a3f0788362b9b7326c87480",
+            "source_hash": "b54162350af1ffa76b4b4b791037d077",
+            "installed_at": "2026-02-09T18:07:17Z",
             "agents": [
                 "claude-code",
                 "cursor"
@@ -17,8 +17,8 @@
                 "CLAUDE.md"
             ],
             "file_hashes": {
-                ".glue/rules/git-commit-message-rules.md": "513bf0f85dbbf2aeaf2f1eb6f4cb004c",
-                ".cursor/rules/git-commit-message-rules.md": "c4e0c9d1ceffc860b5b77fe988c5e31d"
+                ".glue/rules/git-commit-message-rules.md": "bfb30ad56a3f0788362b9b7326c87480",
+                ".cursor/rules/git-commit-message-rules.md": "7d655750e1059e6aa9457ec87dd563fe"
             },
             "reference_files": [
                 "CLAUDE.md"
@@ -134,6 +134,29 @@
             "file_hashes": {
                 ".glue/rules/python-testing-standards.md": "a23dcb007a7b89c4fd23d3e661c10a7c",
                 ".cursor/rules/python-testing-standards.md": "dc9ebca3ee0b76228d2bbe42c88a101e"
+            },
+            "reference_files": [
+                "CLAUDE.md"
+            ]
+        },
+        "rule:git-global-rules": {
+            "type": "rule",
+            "name": "git-global-rules",
+            "installed_hash": "7fcf3e10147cb59474a4376e20a5119f",
+            "source_hash": "5bcfde56efd011df60b373c2709f17ad",
+            "installed_at": "2026-02-09T18:20:19Z",
+            "agents": [
+                "claude-code",
+                "cursor"
+            ],
+            "files": [
+                ".glue/rules/git-global-rules.md",
+                ".cursor/rules/git-global-rules.md",
+                "CLAUDE.md"
+            ],
+            "file_hashes": {
+                ".glue/rules/git-global-rules.md": "7fcf3e10147cb59474a4376e20a5119f",
+                ".cursor/rules/git-global-rules.md": "d232bde0f83d0e84b235810535f4905b"
             },
             "reference_files": [
                 "CLAUDE.md"

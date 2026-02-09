@@ -2,15 +2,6 @@
 description: Git commit message rules
 alwaysApply: true
 ---
-## Commit Rules
-
-**IMPORTANT:** Before completing any task, you MUST run `/commit` to commit your changes.
-
--   Only commit files YOU modified in this session - never commit unrelated changes
--   Use atomic commits with descriptive messages
--   If there are no changes to commit, skip this step
--   Do not push unless explicitly asked
-
 ## Git commit message rules
 
 -   Always use angular style conventional commits style. No Exceptions!
