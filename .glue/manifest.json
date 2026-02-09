@@ -12,16 +12,16 @@
                 "cursor"
             ],
             "files": [
-                "/Users/natelandau/repos/pytest-debug/.glue/rules/git-commit-message-rules.md",
-                "/Users/natelandau/repos/pytest-debug/.cursor/rules/git-commit-message-rules.md",
-                "/Users/natelandau/repos/pytest-debug/CLAUDE.md"
+                ".glue/rules/git-commit-message-rules.md",
+                ".cursor/rules/git-commit-message-rules.md",
+                "CLAUDE.md"
             ],
             "file_hashes": {
-                "/Users/natelandau/repos/pytest-debug/.glue/rules/git-commit-message-rules.md": "513bf0f85dbbf2aeaf2f1eb6f4cb004c",
-                "/Users/natelandau/repos/pytest-debug/.cursor/rules/git-commit-message-rules.md": "c4e0c9d1ceffc860b5b77fe988c5e31d"
+                ".glue/rules/git-commit-message-rules.md": "513bf0f85dbbf2aeaf2f1eb6f4cb004c",
+                ".cursor/rules/git-commit-message-rules.md": "c4e0c9d1ceffc860b5b77fe988c5e31d"
             },
             "reference_files": [
-                "/Users/natelandau/repos/pytest-debug/CLAUDE.md"
+                "CLAUDE.md"
             ]
         },
         "rule:global-coding-standards": {
@@ -35,16 +35,16 @@
                 "cursor"
             ],
             "files": [
-                "/Users/natelandau/repos/pytest-debug/.glue/rules/global-coding-standards.md",
-                "/Users/natelandau/repos/pytest-debug/.cursor/rules/global-coding-standards.md",
-                "/Users/natelandau/repos/pytest-debug/CLAUDE.md"
+                ".glue/rules/global-coding-standards.md",
+                ".cursor/rules/global-coding-standards.md",
+                "CLAUDE.md"
             ],
             "file_hashes": {
-                "/Users/natelandau/repos/pytest-debug/.glue/rules/global-coding-standards.md": "f9d8cb01eff58dfb9af76d09eed118ed",
-                "/Users/natelandau/repos/pytest-debug/.cursor/rules/global-coding-standards.md": "fb1c5f9a01c0ab4109ca5725770a8bc9"
+                ".glue/rules/global-coding-standards.md": "f9d8cb01eff58dfb9af76d09eed118ed",
+                ".cursor/rules/global-coding-standards.md": "fb1c5f9a01c0ab4109ca5725770a8bc9"
             },
             "reference_files": [
-                "/Users/natelandau/repos/pytest-debug/CLAUDE.md"
+                "CLAUDE.md"
             ]
         },
         "rule:inline-comments-standards": {
@@ -58,16 +58,16 @@
                 "cursor"
             ],
             "files": [
-                "/Users/natelandau/repos/pytest-debug/.glue/rules/inline-comments-standards.md",
-                "/Users/natelandau/repos/pytest-debug/.cursor/rules/inline-comments-standards.md",
-                "/Users/natelandau/repos/pytest-debug/CLAUDE.md"
+                ".glue/rules/inline-comments-standards.md",
+                ".cursor/rules/inline-comments-standards.md",
+                "CLAUDE.md"
             ],
             "file_hashes": {
-                "/Users/natelandau/repos/pytest-debug/.glue/rules/inline-comments-standards.md": "1b7783ce59b0397176d684895055611c",
-                "/Users/natelandau/repos/pytest-debug/.cursor/rules/inline-comments-standards.md": "6d2cc8c32de960081ef1385ea1e4364a"
+                ".glue/rules/inline-comments-standards.md": "1b7783ce59b0397176d684895055611c",
+                ".cursor/rules/inline-comments-standards.md": "6d2cc8c32de960081ef1385ea1e4364a"
             },
             "reference_files": [
-                "/Users/natelandau/repos/pytest-debug/CLAUDE.md"
+                "CLAUDE.md"
             ]
         },
         "rule:python-packaging": {
@@ -81,16 +81,16 @@
                 "cursor"
             ],
             "files": [
-                "/Users/natelandau/repos/pytest-debug/.glue/rules/python-packaging.md",
-                "/Users/natelandau/repos/pytest-debug/.cursor/rules/python-packaging.md",
-                "/Users/natelandau/repos/pytest-debug/CLAUDE.md"
+                ".glue/rules/python-packaging.md",
+                ".cursor/rules/python-packaging.md",
+                "CLAUDE.md"
             ],
             "file_hashes": {
-                "/Users/natelandau/repos/pytest-debug/.glue/rules/python-packaging.md": "5327fc3b20112939fef95b338c9d49bc",
-                "/Users/natelandau/repos/pytest-debug/.cursor/rules/python-packaging.md": "e613b62f4710df9738ae63d86cf0f076"
+                ".glue/rules/python-packaging.md": "5327fc3b20112939fef95b338c9d49bc",
+                ".cursor/rules/python-packaging.md": "e613b62f4710df9738ae63d86cf0f076"
             },
             "reference_files": [
-                "/Users/natelandau/repos/pytest-debug/CLAUDE.md"
+                "CLAUDE.md"
             ]
         },
         "rule:python-standards": {
@@ -104,16 +104,16 @@
                 "cursor"
             ],
             "files": [
-                "/Users/natelandau/repos/pytest-debug/.glue/rules/python-standards.md",
-                "/Users/natelandau/repos/pytest-debug/.cursor/rules/python-standards.md",
-                "/Users/natelandau/repos/pytest-debug/CLAUDE.md"
+                ".glue/rules/python-standards.md",
+                ".cursor/rules/python-standards.md",
+                "CLAUDE.md"
             ],
             "file_hashes": {
-                "/Users/natelandau/repos/pytest-debug/.glue/rules/python-standards.md": "473fd31e5e7808b8f252b0cea3fb5f05",
-                "/Users/natelandau/repos/pytest-debug/.cursor/rules/python-standards.md": "2a5c086679d44939829cffced04409cd"
+                ".glue/rules/python-standards.md": "473fd31e5e7808b8f252b0cea3fb5f05",
+                ".cursor/rules/python-standards.md": "2a5c086679d44939829cffced04409cd"
             },
             "reference_files": [
-                "/Users/natelandau/repos/pytest-debug/CLAUDE.md"
+                "CLAUDE.md"
             ]
         },
         "rule:python-testing-standards": {
@@ -127,36 +127,17 @@
                 "cursor"
             ],
             "files": [
-                "/Users/natelandau/repos/pytest-debug/.glue/rules/python-testing-standards.md",
-                "/Users/natelandau/repos/pytest-debug/.cursor/rules/python-testing-standards.md",
-                "/Users/natelandau/repos/pytest-debug/CLAUDE.md"
+                ".glue/rules/python-testing-standards.md",
+                ".cursor/rules/python-testing-standards.md",
+                "CLAUDE.md"
             ],
             "file_hashes": {
-                "/Users/natelandau/repos/pytest-debug/.glue/rules/python-testing-standards.md": "a23dcb007a7b89c4fd23d3e661c10a7c",
-                "/Users/natelandau/repos/pytest-debug/.cursor/rules/python-testing-standards.md": "dc9ebca3ee0b76228d2bbe42c88a101e"
+                ".glue/rules/python-testing-standards.md": "a23dcb007a7b89c4fd23d3e661c10a7c",
+                ".cursor/rules/python-testing-standards.md": "dc9ebca3ee0b76228d2bbe42c88a101e"
             },
             "reference_files": [
-                "/Users/natelandau/repos/pytest-debug/CLAUDE.md"
+                "CLAUDE.md"
             ]
-        },
-        "skill:documentation-writer": {
-            "type": "skill",
-            "name": "documentation-writer",
-            "installed_hash": "3f3150c8704a8d0d6349f5e67c852d6a",
-            "source_hash": "4bea04dfcc40813af6f16b19a4188b05",
-            "installed_at": "2026-02-08T16:07:50Z",
-            "agents": [
-                "claude-code",
-                "cursor"
-            ],
-            "files": [
-                "/Users/natelandau/repos/pytest-debug/.claude/skills/documentation-writer/SKILL.md",
-                "/Users/natelandau/repos/pytest-debug/.cursor/skills/documentation-writer/SKILL.md"
-            ],
-            "file_hashes": {
-                "/Users/natelandau/repos/pytest-debug/.claude/skills/documentation-writer/SKILL.md": "3f3150c8704a8d0d6349f5e67c852d6a",
-                "/Users/natelandau/repos/pytest-debug/.cursor/skills/documentation-writer/SKILL.md": "3f3150c8704a8d0d6349f5e67c852d6a"
-            }
         }
     }
 }
