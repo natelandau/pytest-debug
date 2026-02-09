@@ -1,9 +1,9 @@
-default_install_hook_types = ["commit-msg", "pre-commit", "pre-push"]
+default_install_hook_types = ["commit-msg", "pre-commit"]
 default_stages             = ["manual", "pre-commit"]
 fail_fast                  = true
 
 [[repos]]
-    hooks = [{ id = "commitizen" }, { id = "commitizen-branch", stages = ["pre-push"] }]
+    hooks = [{ id = "commitizen" }]
     repo  = "https://github.com/commitizen-tools/commitizen"
     rev   = "v4.13.5"
 

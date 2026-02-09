@@ -1,6 +1,6 @@
 # pytest-devtools
 
-A pytest plugin that provides developer-experience improvements for your test suite: a Rich-powered debug printer, automatic ANSI stripping from `capsys`, visible whitespace in assertion diffs, and terminal column width management.
+Small pytest plugin that provides some niceties for writing and debugging tests.
 
 ## Features
 
@@ -11,16 +11,12 @@ A pytest plugin that provides developer-experience improvements for your test su
 
 ## Installation
 
-### Using pip
-
 ```bash
-pip install pytest-devtools
-```
-
-### Using uv
-
-```bash
+# Using uv
 uv add pytest-devtools
+
+# Using pip
+pip install pytest-devtools
 ```
 
 **Requirements:** Python 3.11+ and pytest 7.0+

@@ -1,8 +1,7 @@
 [project]
-    authors = [{ name = "Nathaniel Landau", email = "nate@natelandau.com" }]
+    authors = [{ name = "Nathaniel Landau", email = "github@natelandau.com" }]
     classifiers = [
         "Framework :: Pytest",
-        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
@@ -11,14 +10,15 @@
         "Topic :: Software Development :: Testing",
     ]
     dependencies = ["pytest>=7.0", "rich>=14.3.2"]
-    description = "Pytest plugin providing debug fixtures, ANSI-stripped capsys, whitespace-visible assertions, and terminal column management"
+    description = "Pytest plugin providing debug fixtures, ANSI-stripped capsys, whitespace-visible assertions, and terminal column management."
+    license = { file = "LICENSE" }
     name = "pytest-devtools"
     readme = "README.md"
     requires-python = ">=3.11"
     version = "0.1.0"
 
-[project.entry-points.pytest11]
-    pytest-devtools = "devtools.plugin"
+    [project.entry-points.pytest11]
+        pytest-devtools = "devtools.plugin"
 
 [build-system]
     build-backend = "uv_build"
