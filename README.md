@@ -249,6 +249,10 @@ All features can be configured via CLI flags, `pyproject.toml` INI options, or (
 | Visible whitespace | Yes                    | `--no-show-whitespace` or `show_whitespace = false` |
 | Column width       | No                     | `--columns=N` or `set_columns = true`               |
 
+## AI Policy
+
+Claude Code was used in the creation of this package. However, all AI generated content is and always will be meticulously reviewed and approved by the author.
+
 ## License
 
 MIT

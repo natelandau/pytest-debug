@@ -30,10 +30,9 @@
 [dependency-groups]
     dev = [
         "commitizen>=4.13.5",
-        "coverage>=7.13.3",
+        "duty>=1.9.0",
         "prek>=0.3.2",
         "pytest-clarity>=1.0.1",
-        "pytest-cov>=7.0.0",
         "pytest-mock>=3.15.1",
         "pytest-repeat>=0.9.4",
         "pytest-sugar>=1.1.1",
@@ -42,7 +41,7 @@
         "ty>=0.0.15",
         "typos>=1.43.3",
         "yamllint>=1.38.0",
-    ]
+]
 
 [tool.commitizen]
     bump_message               = "bump(release): v$current_version → v$new_version"
@@ -51,31 +50,6 @@
     update_changelog_on_bump   = true
     version                    = "0.1.0"
     version_provider           = "uv"
-
-[tool.coverage.report] # https://coverage.readthedocs.io/en/latest/config.html#report
-    exclude_lines = [
-        'def __repr__',
-        'except [\w\s\._]+ as .*:',
-        'if TYPE_CHECKING',
-        'pragma: no cover',
-        'raise Abort',
-        'raise Exit',
-    ]
-    fail_under = 0
-    precision = 1
-    show_missing = true
-    skip_covered = true
-    skip_empty = true
-
-[tool.coverage.run]
-    branch       = true
-    command_line = "--module pytest"
-    data_file    = ".cache/coverage"
-    omit         = ["tests/*"]
-    source       = ["src"]
-
-[tool.coverage.xml]
-    output = ".cache/coverage.xml"
 
 [tool.pytest.ini_options]
 
