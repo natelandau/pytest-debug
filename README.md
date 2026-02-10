@@ -251,7 +251,7 @@ All features can be configured via CLI flags, `pyproject.toml` INI options, or (
 
 ## AI Policy
 
-Claude Code was used in the creation of this package. However, all AI generated content is and always will be meticulously reviewed and approved by the author.
+All AI generated content is and always will be meticulously reviewed and approved by the author.
 
 ## License
 

@@ -15,7 +15,7 @@
     name = "pytest-devtools"
     readme = "README.md"
     requires-python = ">=3.11"
-    version = "0.1.0"
+    version = "1.0.0"
 
     [project.entry-points.pytest11]
         pytest-devtools = "devtools.plugin"
@@ -41,7 +41,7 @@
         "ty>=0.0.15",
         "typos>=1.43.4",
         "yamllint>=1.38.0",
-]
+    ]
 
 [tool.commitizen]
     bump_message               = "bump(release): v$current_version → v$new_version"
@@ -80,9 +80,6 @@
             "CPY001", # Missing copyright notice at top of file
             "D107",   # undocumented-public-init
             "E501",   # line-too-long
-            # "FBT001", # Boolean-typed positional argument in function definition
-            # "FBT002", # Boolean-typed positional argument in function definition
-            "E711",   # Comparison to `None` should be `cond is None`
             "FIX002", # Line contains TODO, consider resolving the issue
             "S311",   # suspicious-non-cryptographic-random-usage
             "TD001",  # invalid-todo-tag
