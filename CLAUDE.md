@@ -20,7 +20,7 @@ uv run pytest tests/ -n0  # Run tests (use -n0 to disable xdist parallelism for 
 -   **Package name:** `pytest-devtools` (PyPI) / `devtools` (import name)
 -   **Source layout:** `src/devtools/` with `uv_build` backend and `module-name = "devtools"`
 -   **Entry point:** `[project.entry-points.pytest11] pytest-devtools = "devtools.plugin"`
--   **Python:** >=3.11 | **Dependencies:** pytest>=7.0, rich>=14.3.2
+-   **Python:** >=3.11 | **Dependencies:** pytest>=9.0.2, rich>=14.3.2
 
 ### Module Structure
 
@@ -53,16 +53,4 @@ uv run pytest tests/ -n0  # Run tests (use -n0 to disable xdist parallelism for 
 -   **Unused hook parameters:** The `call` parameter in `pytest_runtest_makereport` is required by the hook signature but unused - suppress with `# noqa: ARG001`.
 -   **Boolean positional args:** `_resolve_option` accepts `bool | int | None` as a positional param - suppress ruff FBT001 with `# noqa: FBT001`.
 -   **`contextlib.suppress` over try/except/pass:** Ruff SIM105 prefers `with contextlib.suppress(ExceptionType):` over empty except blocks.
--   **prek.toml hooks:** All commands must use `uv run` prefix (e.g., `uv run pytest tests/`, `uv run ty check src/`) since tools are in the virtualenv.
-
-<!-- agent-glue-rules -->
-
-@.glue/rules/git-commit-message-rules.md
-@.glue/rules/git-global-rules.md
-@.glue/rules/global-coding-standards.md
-@.glue/rules/inline-comments-standards.md
-@.glue/rules/python-packaging.md
-@.glue/rules/python-standards.md
-@.glue/rules/python-testing-standards.md
-
-<!-- agent-glue-rules -->
+-   **Pre-commit hooks:** All hook commands must use `uv run` prefix (e.g., `uv run pytest tests/`, `uv run ty check src/`) since tools are in the virtualenv. See `.pre-commit-config.yaml`.
