@@ -9,7 +9,7 @@
         "Programming Language :: Python :: 3.14",
         "Topic :: Software Development :: Testing",
     ]
-    dependencies = ["pytest>=9.0.2", "rich>=14.3.2"]
+    dependencies = ["pytest>=9.0.3", "rich>=15.0.0"]
     description = "Pytest plugin providing debug fixtures, ANSI-stripped capsys, whitespace-visible assertions, and terminal column management."
     license = { file = "LICENSE" }
     name = "pytest-devtools"
