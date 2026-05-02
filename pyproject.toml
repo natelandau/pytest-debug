@@ -9,7 +9,7 @@
         "Programming Language :: Python :: 3.14",
         "Topic :: Software Development :: Testing",
     ]
-    dependencies = ["pytest>=9.0.2", "rich>=14.3.2"]
+    dependencies = ["pytest>=9.0.3", "rich>=15.0.0"]
     description = "Pytest plugin providing debug fixtures, ANSI-stripped capsys, whitespace-visible assertions, and terminal column management."
     license = { file = "LICENSE" }
     name = "pytest-devtools"
@@ -29,17 +29,17 @@
 
 [dependency-groups]
     dev = [
-        "commitizen>=4.13.7",
+        "commitizen>=4.15.0",
         "duty>=1.9.0",
-        "prek>=0.3.2",
+        "prek>=0.3.11",
         "pytest-clarity>=1.0.1",
         "pytest-mock>=3.15.1",
         "pytest-repeat>=0.9.4",
         "pytest-sugar>=1.1.1",
         "pytest-xdist>=3.8.0",
-        "ruff>=0.15.0",
-        "ty>=0.0.15",
-        "typos>=1.43.4",
+        "ruff>=0.15.12",
+        "ty>=0.0.34",
+        "typos>=1.46.0",
         "yamllint>=1.38.0",
     ]
 
@@ -132,3 +132,6 @@
         line-ending               = "auto"
         quote-style               = "double"
         skip-magic-trailing-comma = false
+
+[tool.ty.terminal]
+    error-on-warning = true

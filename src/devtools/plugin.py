@@ -44,7 +44,7 @@ def pytest_runtest_makereport(
         The test report.
     """
     rep = yield
-    item.stash.setdefault(phase_report_key, {})[rep.when] = rep
+    item.stash.setdefault(phase_report_key, {})[rep.when] = rep  # ty:ignore[invalid-assignment]
     return rep
 
 
