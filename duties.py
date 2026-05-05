@@ -5,10 +5,10 @@ from __future__ import annotations
 import os
 import re
 import sys
-import tomllib
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import tomllib
 from duty import duty, tools
 from rich.console import Console
 
