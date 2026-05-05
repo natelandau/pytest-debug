@@ -5,7 +5,6 @@ from __future__ import annotations
 import os
 import re
 import sys
-import tomllib
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -22,7 +21,7 @@ PY_SRC_PATHS = (Path(_) for _ in ("src/", "tests/", "duties.py", "scripts/") if 
 PY_SRC_LIST = tuple(str(_) for _ in PY_SRC_PATHS)
 CI = os.environ.get("CI", "0") in {"1", "true", "yes", ""}
 PROJECT_ROOT = Path(__file__).parent
-VERSION = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))["project"]["version"]
+
 DEV_DIR = PROJECT_ROOT / ".dev"
 DEV_DIRECTORIES = [
     DEV_DIR / "logs",
