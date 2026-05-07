@@ -1,3 +1,22 @@
-.claude/settings.local.json
-.venv/
+# Scratch folder for temporary files
 .cache/
+.cursor/
+.claude/
+.dev/
+.development/
+.github/copilot-instructions.md
+.github/instructions/
+.worktrees/
+dev-config.toml
+development/
+scratch/
+tmp/
+
+# macOS
+.DS_Store
+
+# Python
+.venv/
+dist/
+*_cache/
+__pycache__/
