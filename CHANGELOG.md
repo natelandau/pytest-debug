@@ -1,3 +1,10 @@
+## v1.2.0 (2026-05-07)
+
+### Feat
+
+- **pytest**: support pytest >=7 (#8)
+- **capsys**: add opt-in tmp_path stripping (#6)
+
 ## v1.1.0 (2026-05-05)
 
 ### Feat
