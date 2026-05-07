@@ -140,7 +140,13 @@ def test(ctx: Context, *cli_args: str) -> None:
             "tests/",
             config_file="pyproject.toml",
             color="yes",
-        ).add_args(*cli_args),
+        ).add_args(
+            "--cov",
+            "--cov-config=pyproject.toml",
+            "--cov-report=xml",
+            "--cov-report=term",
+            *cli_args,
+        ),
         title=pyprefix("Running tests - this may take a while"),
         capture=CI,
     )
