@@ -19,7 +19,7 @@ uv add pytest-devtools
 pip install pytest-devtools
 ```
 
-**Requirements:** Python 3.10+ and pytest 9.0+.
+**Requirements:** Python 3.10+ and pytest 7.0+.
 
 The plugin registers itself through the `pytest11` entry point, so no `conftest.py` changes are needed.
 
