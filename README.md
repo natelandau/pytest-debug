@@ -1,5 +1,8 @@
 # pytest-devtools
 
+[![Automated Tests](https://github.com/natelandau/pytest-devtools/actions/workflows/automated-tests.yml/badge.svg)](https://github.com/natelandau/pytest-devtools/actions/workflows/automated-tests.yml)
+[![codecov](https://codecov.io/gh/natelandau/pytest-devtools/graph/badge.svg)](https://codecov.io/gh/natelandau/pytest-devtools)
+
 A pytest plugin that smooths over a few common annoyances when writing and debugging tests.
 
 ## Features
