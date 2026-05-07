@@ -1,31 +1,31 @@
 # pytest-devtools
 
-Small pytest plugin that provides some niceties for writing and debugging tests.
+A pytest plugin that smooths over a few common annoyances when writing and debugging tests.
 
 ## Features
 
--   **Debug fixture** -- Pretty-print variables, paths, and data structures with Rich. Output appears only when tests fail (or always with `--print-debug`).
--   **ANSI-stripped capsys** -- Automatically strip ANSI escape sequences from captured output so assertions don't break on color codes.
--   **Visible whitespace** -- Replace invisible whitespace characters (tabs, trailing spaces, carriage returns, newlines) with Unicode symbols in assertion failure diffs.
--   **Terminal column width** -- Optionally set the `COLUMNS` environment variable so Rich and other terminal-aware libraries don't introduce unwanted line wraps.
+- **Debug fixture**: pretty-prints variables, paths, and data structures with [Rich](https://rich.readthedocs.io/), and only shows the output when a test fails.
+- **Stripped `capsys` output**: removes ANSI escape codes (and optionally the `tmp_path` prefix) from captured stdout/stderr so assertions stay readable.
+- **Visible whitespace in diffs**: replaces tabs, trailing spaces, carriage returns, and newlines with Unicode symbols when an assertion fails.
+- **Terminal column width control**: sets `COLUMNS` for every test so libraries that auto-wrap (Rich, Click, etc.) produce stable output.
 
 ## Installation
 
 ```bash
-# Using uv
+# uv
 uv add pytest-devtools
 
-# Using pip
+# pip
 pip install pytest-devtools
 ```
 
-**Requirements:** Python 3.11+ and pytest 7.0+
+**Requirements:** Python 3.10+ and pytest 9.0+.
 
-The plugin activates automatically once installed. No `conftest.py` changes are needed.
+The plugin registers itself through the `pytest11` entry point, so no `conftest.py` changes are needed.
 
 ## Debug Fixture
 
-The `debug` fixture gives you a callable that pretty-prints any Python object using Rich. Output is collected during the test and flushed to stderr only when the test fails.
+The `debug` fixture is a callable that pretty-prints any Python object using Rich. Output is buffered during the test and written to stderr only if the test fails (or always, with `--print-debug`).
 
 ### Basic Usage
 
@@ -41,7 +41,7 @@ def test_user_creation(debug, tmp_path):
     assert user["name"] == "Alice"
 ```
 
-On failure, stderr shows the Rich-formatted output between rule separators:
+When the test fails, stderr shows the buffered output between rule separators:
 
 ```
 ──────────────────────────── Debug ─────────────────────────────
@@ -51,7 +51,7 @@ On failure, stderr shows the Rich-formatted output between rule separators:
 
 ### Multiple Values and Titles
 
-Pass multiple arguments in a single call, and use `title` to label sections:
+Pass several arguments in a single call, and use `title` to label the section:
 
 ```python
 def test_transform(debug):
@@ -62,7 +62,7 @@ def test_transform(debug):
 
 ### Per-Call Options
 
-Every option can be overridden on a per-call basis:
+Override any option on a single call:
 
 ```python
 def test_deep_structure(debug, tmp_path):
@@ -86,10 +86,10 @@ def test_deep_structure(debug, tmp_path):
 
 ### Path Handling
 
-When you pass a `pathlib.Path` to `debug`:
+When you pass a `pathlib.Path`:
 
--   **tmp_path stripping** (default: on) -- If the path is inside `tmp_path`, only the relative portion is shown. A path like `/var/folders/.../pytest-1234/test_foo0/subdir/file.txt` displays as `subdir/file.txt`.
--   **Directory listing** (default: off) -- When enabled and the path is a directory, a Rich tree shows the full directory contents recursively.
+- `tmp_path` stripping (default: on). If the path is inside `tmp_path`, only the relative portion is shown. A path like `/var/folders/.../pytest-1234/test_foo0/subdir/file.txt` displays as `subdir/file.txt`.
+- Directory listing (default: off). When enabled and the path is a directory, a Rich tree shows the directory contents recursively.
 
 ### CLI Options
 
@@ -121,30 +121,34 @@ debug_show_type = false
 
 ### Option Precedence
 
-Per-call arguments take highest priority, then CLI flags, then INI settings:
+Per-call arguments win, then CLI flags, then INI settings:
 
 ```
 per-call override  >  CLI flag  >  INI option  >  built-in default
 ```
 
-## ANSI-Stripped capsys
+## Stripped `capsys` Output
 
-By default, `capsys.readouterr()` returns output with ANSI escape sequences removed. This makes assertions simpler when testing code that uses colored output (Rich, Click, Colorama, etc.).
+The plugin overrides the built-in `capsys` fixture so that `readouterr()` returns post-processed strings. Two transformations are available:
 
-### Basic Usage
+- ANSI escape stripping (default: on)
+- `tmp_path` prefix stripping (default: off, opt-in)
+
+Both can be disabled or enabled independently, and they compose when both are active.
+
+### ANSI Escape Stripping
+
+Tests that exercise code printing colored output (Rich, Click, Colorama, etc.) usually don't care about the escape codes. By default, they're removed before you see the captured string:
 
 ```python
 def test_greeting(capsys):
-    # Imagine this function uses Rich to print colored output
     print("\x1b[32mHello, world!\x1b[0m")
 
     captured = capsys.readouterr()
-    assert captured.out == "Hello, world!\n"  # No ANSI codes to worry about
+    assert captured.out == "Hello, world!\n"
 ```
 
-### Keeping ANSI Codes
-
-For tests that need to verify color output, disable stripping per-test with a marker:
+To keep the codes for a single test, mark it with `@pytest.mark.keep_ansi`:
 
 ```python
 import pytest
@@ -156,22 +160,54 @@ def test_color_codes(capsys):
     assert "\x1b[32m" in captured.out
 ```
 
-Or disable stripping globally with a CLI flag:
+To turn stripping off globally:
 
 ```bash
 pytest --no-strip-ansi
 ```
 
-### INI Option
+### `tmp_path` Stripping
+
+Code that prints a `tmp_path`-rooted file produces output like `/var/folders/.../pytest-1234/test_foo0/file.txt`, which is awkward to assert on. Opt in to capsys `tmp_path` stripping to collapse those prefixes to their relative portion:
+
+```python
+def test_writes_log(capsys, tmp_path):
+    log = tmp_path / "app.log"
+    print(f"wrote {log}")
+
+    captured = capsys.readouterr()
+    assert captured.out == "wrote app.log\n"
+```
+
+Enable it for one run:
+
+```bash
+pytest --capsys-strip-tmp-path
+```
+
+Or globally in `pyproject.toml`:
 
 ```toml
 [tool.pytest.ini_options]
-strip_ansi = false
+capsys_strip_tmp_path = true
+```
+
+`--no-capsys-strip-tmp-path` overrides the INI setting for a single run. Stripping applies to both `captured.out` and `captured.err`.
+
+> [!NOTE]
+> When both transformations are active, ANSI codes are stripped first, then `tmp_path` prefixes. The order matters only if your output mixes the two, but the combined result is what you'd expect.
+
+### INI Options
+
+```toml
+[tool.pytest.ini_options]
+strip_ansi = true                # default: true
+capsys_strip_tmp_path = false    # default: false
 ```
 
 ## Visible Whitespace in Assertions
 
-When two strings differ only by whitespace, pytest's default diff is hard to read. This plugin replaces invisible characters with visible Unicode symbols in assertion failure output.
+When two strings differ only in whitespace, pytest's default diff is hard to read. This plugin replaces invisible characters with visible Unicode symbols in the assertion failure message.
 
 ### Symbol Reference
 
@@ -203,20 +239,21 @@ Whitespace-visible comparison:
 
 ### Disabling
 
-Disable with the `--no-show-whitespace` CLI flag or in INI:
+Use the `--no-show-whitespace` CLI flag, or set the INI option:
 
 ```toml
 [tool.pytest.ini_options]
 show_whitespace = false
 ```
 
-> **Note:** Whitespace visibility only activates for `==` comparisons between strings, and only when the replacement actually changes the display. Non-string comparisons and strings without special whitespace are unaffected.
+> [!NOTE]
+> Whitespace visibility activates only for `==` comparisons between strings, and only when the replacement actually changes how the string displays. Non-string comparisons and strings without notable whitespace are unaffected.
 
 ## Terminal Column Width
 
-Many terminal-aware libraries (Rich, Click, etc.) detect the terminal width at runtime. In test environments, the detected width is often very small, causing unwanted line wraps in captured output. This plugin can set the `COLUMNS` environment variable for every test to prevent this.
+Many terminal-aware libraries (Rich, Click, etc.) detect terminal width at runtime. In test environments, the detected width is often very small, which causes unwanted line wraps in captured output. This plugin can set the `COLUMNS` environment variable for every test to keep output stable.
 
-This feature is **disabled by default**. Enable it with the `--columns` CLI flag or via INI options.
+The feature is **disabled by default**. Enable it with the `--columns` CLI flag or via INI options.
 
 ### CLI Option
 
@@ -228,26 +265,27 @@ pytest --columns=180
 
 ### INI Options
 
-Enable permanently in `pyproject.toml`:
+Enable it permanently in `pyproject.toml`:
 
 ```toml
 [tool.pytest.ini_options]
-set_columns = true   # Enable the feature
-columns = 180        # Value to set (default when enabled)
+set_columns = true   # turn the feature on
+columns = 180        # value to set when enabled
 ```
 
 The `--columns` CLI flag overrides the INI `columns` value when both are present.
 
 ## Configuration Summary
 
-All features can be configured via CLI flags, `pyproject.toml` INI options, or (for the debug fixture) per-call arguments.
+Every feature is configurable through CLI flags and `pyproject.toml` INI options. The debug fixture additionally supports per-call arguments.
 
-| Feature            | Enabled by default     | Enable/Disable with                                 |
-| ------------------ | ---------------------- | --------------------------------------------------- |
-| Debug fixture      | Output on failure only | N/A (always available)                              |
-| ANSI stripping     | Yes                    | `--no-strip-ansi` or `strip_ansi = false`           |
-| Visible whitespace | Yes                    | `--no-show-whitespace` or `show_whitespace = false` |
-| Column width       | No                     | `--columns=N` or `set_columns = true`               |
+| Feature                | Default               | Toggle with                                                       |
+| ---------------------- | --------------------- | ----------------------------------------------------------------- |
+| Debug fixture          | Output on failure     | Always available; `--print-debug` to also show on success         |
+| ANSI stripping         | On                    | `--no-strip-ansi` or `strip_ansi = false`                         |
+| `tmp_path` in `capsys` | Off                   | `--capsys-strip-tmp-path` or `capsys_strip_tmp_path = true`       |
+| Visible whitespace     | On                    | `--no-show-whitespace` or `show_whitespace = false`               |
+| Column width           | Off                   | `--columns=N` or `set_columns = true`                             |
 
 ## AI Policy
 

@@ -115,3 +115,121 @@ def test_capsys_ini_disable(pytester):
 
     # Then: the test passes
     result.assert_outcomes(passed=1)
+
+
+def test_capsys_strip_tmp_path_default_off(pytester):
+    """Verify tmp_path is preserved in capsys output by default."""
+    # Given: a test that prints a tmp_path-rooted path with no opt-in
+    pytester.makepyfile("""
+        def test_keeps_tmp_path(capsys, tmp_path):
+            f = tmp_path / "file.txt"
+            print(f)
+            captured = capsys.readouterr()
+            assert str(tmp_path) in captured.out
+    """)
+
+    # When: running with no tmp_path stripping flags
+    result = pytester.runpytest()
+
+    # Then: the test passes (tmp_path was not stripped)
+    result.assert_outcomes(passed=1)
+
+
+def test_capsys_strip_tmp_path_cli_flag_stdout(pytester):
+    """Verify --capsys-strip-tmp-path strips the tmp_path prefix from stdout."""
+    # Given: a test that prints a path nested under tmp_path
+    pytester.makepyfile("""
+        def test_strips_tmp_path(capsys, tmp_path):
+            f = tmp_path / "subdir" / "file.txt"
+            print(f"wrote to {f}")
+            captured = capsys.readouterr()
+            assert captured.out == "wrote to subdir/file.txt\\n"
+    """)
+
+    # When: running with --capsys-strip-tmp-path
+    result = pytester.runpytest("--capsys-strip-tmp-path")
+
+    # Then: the test passes
+    result.assert_outcomes(passed=1)
+
+
+def test_capsys_strip_tmp_path_cli_flag_stderr(pytester):
+    """Verify --capsys-strip-tmp-path strips the tmp_path prefix from stderr."""
+    # Given: a test that prints a tmp_path path to stderr
+    pytester.makepyfile("""
+        import sys
+
+        def test_strips_tmp_path_err(capsys, tmp_path):
+            f = tmp_path / "log.txt"
+            print(f, file=sys.stderr)
+            captured = capsys.readouterr()
+            assert captured.err == "log.txt\\n"
+    """)
+
+    # When: running with --capsys-strip-tmp-path
+    result = pytester.runpytest("--capsys-strip-tmp-path")
+
+    # Then: the test passes
+    result.assert_outcomes(passed=1)
+
+
+def test_capsys_strip_tmp_path_ini_enable(pytester):
+    """Verify capsys_strip_tmp_path ini option enables stripping."""
+    # Given: ini config enables tmp_path stripping
+    pytester.makeini("""
+        [pytest]
+        capsys_strip_tmp_path = true
+    """)
+    pytester.makepyfile("""
+        def test_strips(capsys, tmp_path):
+            f = tmp_path / "x.txt"
+            print(f)
+            captured = capsys.readouterr()
+            assert captured.out == "x.txt\\n"
+    """)
+
+    # When: running the test
+    result = pytester.runpytest()
+
+    # Then: the test passes
+    result.assert_outcomes(passed=1)
+
+
+def test_capsys_no_strip_tmp_path_overrides_ini(pytester):
+    """Verify --no-capsys-strip-tmp-path overrides an ini-enabled setting."""
+    # Given: ini enables stripping but CLI disables it
+    pytester.makeini("""
+        [pytest]
+        capsys_strip_tmp_path = true
+    """)
+    pytester.makepyfile("""
+        def test_keeps(capsys, tmp_path):
+            f = tmp_path / "x.txt"
+            print(f)
+            captured = capsys.readouterr()
+            assert str(tmp_path) in captured.out
+    """)
+
+    # When: running with --no-capsys-strip-tmp-path
+    result = pytester.runpytest("--no-capsys-strip-tmp-path")
+
+    # Then: the test passes (CLI overrode the ini)
+    result.assert_outcomes(passed=1)
+
+
+def test_capsys_strip_tmp_path_combined_with_ansi(pytester):
+    """Verify tmp_path and ANSI stripping compose in a single readouterr() call."""
+    # Given: a test mixing ANSI and tmp_path output
+    pytester.makepyfile("""
+        def test_combined(capsys, tmp_path):
+            f = tmp_path / "out.txt"
+            print(f"\\x1b[31m{f}\\x1b[0m")
+            captured = capsys.readouterr()
+            assert captured.out == "out.txt\\n"
+    """)
+
+    # When: running with --capsys-strip-tmp-path (ANSI strips by default)
+    result = pytester.runpytest("--capsys-strip-tmp-path")
+
+    # Then: both transformations applied
+    result.assert_outcomes(passed=1)
