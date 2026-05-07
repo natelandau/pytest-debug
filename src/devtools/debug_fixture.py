@@ -20,6 +20,8 @@ from rich.console import Console
 from rich.pretty import pretty_repr
 from rich.tree import Tree
 
+from devtools._options import resolve_option
+
 phase_report_key = pytest.StashKey[dict[str, pytest.CollectReport]]()
 
 
@@ -97,33 +99,6 @@ def add_options(parser: pytest.Parser) -> None:
     parser.addini("debug_show_type", type="bool", default=False, help="Show type annotations")
 
 
-def _resolve_option(
-    request: pytest.FixtureRequest,
-    name: str,
-    per_call: bool | int | None,  # noqa: FBT001
-) -> Any:
-    """Resolve a config option with per-call override.
-
-    Per-call value takes precedence, then CLI flag, then ini option.
-
-    Args:
-        request: The pytest fixture request.
-        name: The option name (matching both getoption dest and ini key).
-        per_call: The per-call override value, or None to use global default.
-
-    Returns:
-        The resolved option value.
-    """
-    if per_call is not None:
-        return per_call
-
-    cli_value = request.config.getoption(name, default=None)
-    if cli_value is not None:
-        return cli_value
-
-    return request.config.getini(name)
-
-
 def _build_dir_tree(path: Path, base_name: str) -> Tree:
     """Build a Rich Tree showing directory contents.
 
@@ -176,13 +151,13 @@ class DebugPrinter:
             max_length: Override global max_length setting.
             show_type: Override global show_type setting.
         """
-        resolved_strip = _resolve_option(self._request, "debug_strip_tmp_path", strip_tmp_path)
-        resolved_list_dir = _resolve_option(
+        resolved_strip = resolve_option(self._request, "debug_strip_tmp_path", strip_tmp_path)
+        resolved_list_dir = resolve_option(
             self._request, "debug_list_dir_contents", list_dir_contents
         )
-        resolved_depth_raw = _resolve_option(self._request, "debug_max_depth", max_depth)
-        resolved_length_raw = _resolve_option(self._request, "debug_max_length", max_length)
-        resolved_show_type = _resolve_option(self._request, "debug_show_type", show_type)
+        resolved_depth_raw = resolve_option(self._request, "debug_max_depth", max_depth)
+        resolved_length_raw = resolve_option(self._request, "debug_max_length", max_length)
+        resolved_show_type = resolve_option(self._request, "debug_show_type", show_type)
 
         resolved_depth = int(resolved_depth_raw) if resolved_depth_raw else None
         resolved_length = int(resolved_length_raw) if resolved_length_raw else None
