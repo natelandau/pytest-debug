@@ -12,7 +12,7 @@ Run after every change:
 uv run ruff check    # Lint (autofix enabled)
 uv run ruff format   # Format
 uv run ty check src/ # Type check
-uv run pytest tests/ -n0  # Run tests (use -n0 to disable xdist parallelism for debugging)
+uv run pytest tests/ # Run tests
 ```
 
 ## Architecture
@@ -20,7 +20,7 @@ uv run pytest tests/ -n0  # Run tests (use -n0 to disable xdist parallelism for 
 -   **Package name:** `pytest-devtools` (PyPI) / `devtools` (import name)
 -   **Source layout:** `src/devtools/` with `uv_build` backend and `module-name = "devtools"`
 -   **Entry point:** `[project.entry-points.pytest11] pytest-devtools = "devtools.plugin"`
--   **Python:** >=3.11 | **Dependencies:** pytest>=9.0.2, rich>=14.3.2
+-   **Python:** >=3.10 | **Dependencies:** pytest>=7, rich>=15.0.0
 
 ### Module Structure
 
@@ -44,7 +44,7 @@ uv run pytest tests/ -n0  # Run tests (use -n0 to disable xdist parallelism for 
 -   All tests use the **pytester** fixture (subprocess-based pytest plugin testing). The `conftest.py` loads it via `pytest_plugins = ["pytester"]`.
 -   Tests run pytester subprocesses which get their own plugin instance. Be aware that **environment variables from the parent process leak into pytester subprocesses** - use `monkeypatch` to control the environment when testing features that read env vars (see `test_columns_disabled`).
 -   On **macOS**, `tmp_path` resolves to `/var/folders/.../T/`, not `/tmp/`. Don't assert on path strings containing "tmp" - use structural assertions instead.
--   Use `-n0` when running tests locally to disable xdist parallelism (helpful for debugging). The default `addopts` includes `-n auto`.
+-   **Pytest version floor is 7.0.** `pytest_runtest_makereport` uses pluggy's `wrapper=True` hookimpl, which needs pluggy >=1.4 — pytest 7+ resolves to a compatible pluggy transitively. CI's `reusable-tests.yml` matrix exercises pytest 7.x and 8.x in addition to the dev pin to catch regressions in this floor.
 
 ## Gotchas and Lessons Learned
 

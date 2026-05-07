@@ -17,6 +17,17 @@ jobs:
             fail-fast: true
             matrix:
                 python-version: [ "3.10", "3.11", "3.12", "3.13", "3.14" ]
+                pytest-version: [ "" ]
+                include:
+                    # Compat checks: ensure plugin works on supported older pytest
+                    - python-version: "3.10"
+                      pytest-version: "7"
+                    - python-version: "3.10"
+                      pytest-version: "8"
+                    - python-version: "3.13"
+                      pytest-version: "7"
+                    - python-version: "3.13"
+                      pytest-version: "8"
         steps:
             - name: Checkout repository
               uses: actions/checkout@v6
@@ -26,13 +37,23 @@ jobs:
               with:
                   python-version: ${{ matrix.python-version }}
 
+            - name: Pin pytest to ${{ matrix.pytest-version }}.x
+              if: matrix.pytest-version != ''
+              shell: bash
+              run: |
+                  floor="${{ matrix.pytest-version }}"
+                  ceil=$((floor + 1))
+                  uv pip install --python .venv/bin/python "pytest>=${floor},<${ceil}"
+
             - name: Run tests
               shell: bash
+              env:
+                  UV_NO_SYNC: "1"
               run: |
                   uv run pytest tests/ src/ --config-file pyproject.toml --color=yes --cov --cov-config=pyproject.toml --cov-report=xml --cov-report=term
 
             - name: Upload coverage to Codecov
-              if: ${{ inputs.run-coverage && matrix.python-version == '3.13' }}
+              if: ${{ inputs.run-coverage && matrix.python-version == '3.13' && matrix.pytest-version == '' }}
               uses: codecov/codecov-action@v6
               with:
                   files: .cache/coverage.xml

@@ -1,5 +1,8 @@
 # pytest-devtools
 
+[![Automated Tests](https://github.com/natelandau/pytest-devtools/actions/workflows/automated-tests.yml/badge.svg)](https://github.com/natelandau/pytest-devtools/actions/workflows/automated-tests.yml)
+[![codecov](https://codecov.io/gh/natelandau/pytest-devtools/graph/badge.svg)](https://codecov.io/gh/natelandau/pytest-devtools)
+
 A pytest plugin that smooths over a few common annoyances when writing and debugging tests.
 
 ## Features
@@ -19,7 +22,7 @@ uv add pytest-devtools
 pip install pytest-devtools
 ```
 
-**Requirements:** Python 3.10+ and pytest 9.0+.
+**Requirements:** Python 3.10+ and pytest 7.0+.
 
 The plugin registers itself through the `pytest11` entry point, so no `conftest.py` changes are needed.
 
