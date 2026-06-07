@@ -10,7 +10,7 @@
         "Programming Language :: Python :: 3.14",
         "Topic :: Software Development :: Testing",
     ]
-    dependencies = ["pytest>=7", "rich>=15.0.0"]
+    dependencies = ["pytest>=9.0.3", "rich>=15.0.0"]
     description = "Pytest plugin providing debug fixtures, ANSI-stripped capsys, whitespace-visible assertions, and terminal column management."
     license = { file = "LICENSE" }
     name = "pytest-devtools"
@@ -30,19 +30,19 @@
 
 [dependency-groups]
     dev = [
-        "commitizen>=4.15.0",
-        "coverage>=7.13.5",
+        "commitizen>=4.16.3",
+        "coverage>=7.14.1",
         "duty>=1.9.0",
-        "prek>=0.3.11",
+        "prek>=0.4.4",
         "pytest-clarity>=1.0.1",
         "pytest-cov>=7.1.0",
         "pytest-mock>=3.15.1",
         "pytest-repeat>=0.9.4",
-        "ruff>=0.15.12",
-        "ty>=0.0.34",
-        "typos>=1.46.0",
+        "ruff>=0.15.16",
+        "ty>=0.0.44",
+        "typos>=1.47.2",
         "yamllint>=1.38.0",
-]
+    ]
 
 [tool.commitizen]
     bump_message               = "bump(release): v$current_version → v$new_version"
