@@ -18,16 +18,28 @@ jobs:
             matrix:
                 python-version: [ "3.10", "3.11", "3.12", "3.13", "3.14" ]
                 pytest-version: [ "" ]
+                typer-spec: [ "" ]
                 include:
                     # Compat checks: ensure plugin works on supported older pytest
                     - python-version: "3.10"
                       pytest-version: "7"
+                      typer-spec: ""
                     - python-version: "3.10"
                       pytest-version: "8"
+                      typer-spec: ""
                     - python-version: "3.13"
                       pytest-version: "7"
+                      typer-spec: ""
                     - python-version: "3.13"
                       pytest-version: "8"
+                      typer-spec: ""
+                    # Compat checks: typer before and after it vendored click in 0.26
+                    - python-version: "3.13"
+                      pytest-version: ""
+                      typer-spec: "typer>=0.25,<0.26"
+                    - python-version: "3.13"
+                      pytest-version: ""
+                      typer-spec: "typer>=0.26"
         steps:
             - name: Checkout repository
               uses: actions/checkout@v6
@@ -45,6 +57,11 @@ jobs:
                   ceil=$((floor + 1))
                   uv pip install --python .venv/bin/python "pytest>=${floor},<${ceil}"
 
+            - name: Pin typer to ${{ matrix.typer-spec }}
+              if: matrix.typer-spec != ''
+              shell: bash
+              run: uv pip install --python .venv/bin/python "${{ matrix.typer-spec }}"
+
             - name: Run tests
               shell: bash
               env:
@@ -53,7 +70,7 @@ jobs:
                   uv run pytest tests/ src/ --config-file pyproject.toml --color=yes --cov --cov-config=pyproject.toml --cov-report=xml --cov-report=term
 
             - name: Upload coverage to Codecov
-              if: ${{ inputs.run-coverage && matrix.python-version == '3.13' && matrix.pytest-version == '' }}
+              if: ${{ inputs.run-coverage && matrix.python-version == '3.13' && matrix.pytest-version == '' && matrix.typer-spec == '' }}
               uses: codecov/codecov-action@v6
               with:
                   files: .cache/coverage.xml
