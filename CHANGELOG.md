@@ -1,3 +1,9 @@
+## v1.3.0 (2026-07-25)
+
+### Feat
+
+- **cli-runner**: post-process click and typer CliRunner output (#11)
+
 ## v1.2.0 (2026-05-07)
 
 ### Feat
