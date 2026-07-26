@@ -9,8 +9,11 @@ import pytest
 if TYPE_CHECKING:
     from collections.abc import Generator
 
-from devtools import capsys_strip, columns, debug_fixture, whitespace
+from devtools import capsys_strip, cli_runners, columns, debug_fixture, whitespace
 from devtools.capsys_strip import capsys as capsys  # noqa: PLC0414
+from devtools.cli_runners import _patch_cli_result as _patch_cli_result  # noqa: PLC0414
+from devtools.cli_runners import cli_runner as cli_runner  # noqa: PLC0414
+from devtools.cli_runners import typer_runner as typer_runner  # noqa: PLC0414
 from devtools.columns import _set_columns as _set_columns  # noqa: PLC0414
 from devtools.debug_fixture import debug as debug  # noqa: PLC0414
 from devtools.debug_fixture import phase_report_key
@@ -22,6 +25,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     capsys_strip.add_options(parser)
     whitespace.add_options(parser)
     debug_fixture.add_options(parser)
+    cli_runners.add_options(parser)
 
 
 def pytest_configure(config: pytest.Config) -> None:

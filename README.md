@@ -11,6 +11,7 @@ A pytest plugin that smooths over a few common annoyances when writing and debug
 - **Stripped `capsys` output**: removes ANSI escape codes (and optionally the `tmp_path` prefix) from captured stdout/stderr so assertions stay readable.
 - **Visible whitespace in diffs**: replaces tabs, trailing spaces, carriage returns, and newlines with Unicode symbols when an assertion fails.
 - **Terminal column width control**: sets `COLUMNS` for every test so libraries that auto-wrap (Rich, Click, etc.) produce stable output.
+- **CLI runner output post-processing**: `cli_runner` and `typer_runner` fixtures strip ANSI codes, `tmp_path` prefixes, and trailing whitespace from `click`/`typer` `CliRunner` results, the same way `capsys` does for regular captured output.
 
 ## Installation
 
@@ -208,6 +209,116 @@ strip_ansi = true                # default: true
 capsys_strip_tmp_path = false    # default: false
 ```
 
+## CLI Runner Output
+
+`click.testing.CliRunner` and `typer.testing.CliRunner` replace `sys.stdout` and `sys.stderr` with their own in-memory buffers while a command runs. Nothing a CLI writes inside `invoke()` reaches pytest's capture machinery, so the `capsys` override above cannot see it and `result.output` arrives unprocessed.
+
+The `cli_runner` and `typer_runner` fixtures are drop-in replacements that post-process the runner's own `Result`.
+
+```bash
+# uv
+uv add --dev "pytest-devtools[click]"
+uv add --dev "pytest-devtools[typer]"
+
+# pip
+pip install "pytest-devtools[click]"
+pip install "pytest-devtools[typer]"
+```
+
+Neither extra is strictly required. A project testing a CLI already depends on click or typer directly, and the fixtures activate whenever the library is importable. The extras exist to record the supported versions:
+
+| Fixture        | Requires      |
+| -------------- | ------------- |
+| `cli_runner`   | `click>=8.2`  |
+| `typer_runner` | `typer>=0.25` |
+
+Those floors are where the runner exposes stdout and stderr as separate strings. Below them, `result.stderr` raises `ValueError: stderr not separately captured` and `result.output` silently returns the two streams mixed together. Both fixtures check the installed version at setup and fail with an explicit message rather than letting that surface later.
+
+### click
+
+```python
+from myapp.cli import main
+
+
+def test_greeting(cli_runner):
+    result = cli_runner.invoke(main, ["--name", "world"])
+
+    assert result.exit_code == 0
+    assert result.output == "Hello world\n"
+```
+
+### typer
+
+```python
+from myapp.cli import app
+
+
+def test_greeting(typer_runner):
+    result = typer_runner.invoke(app, ["--name", "world"])
+
+    assert result.exit_code == 0
+    assert result.output == "Hello world\n"
+```
+
+Both fixtures are real subclasses of their framework's runner, so `isolated_filesystem()` and every other runner method work as usual. Only `invoke()` changes.
+
+When a transform is active, `invoke()` returns a transparent proxy over the framework's `Result`: `isinstance(result, click.testing.Result)` and a `-> Result` annotation both hold, but `type(result)` reports the proxy, not the framework's class.
+
+### ANSI Escape Stripping
+
+On by default, and controlled by the same settings as `capsys`: `--no-strip-ansi`, `strip_ansi = false`, and `@pytest.mark.keep_ansi` for a single test.
+
+This matters most for CLIs that print through Rich. Click strips its own `echo()` styling inside the runner already, but a `Console(force_terminal=True)` writes escape codes straight past that.
+
+### `tmp_path` Stripping
+
+Off by default. Enable with `--cli-runner-strip-tmp-path` or `cli_runner_strip_tmp_path = true` to collapse paths under `tmp_path` to their relative portion:
+
+```python
+def test_writes_file(cli_runner, tmp_path):
+    result = cli_runner.invoke(main, ["--out", str(tmp_path / "sub" / "report.txt")])
+
+    assert "wrote sub/report.txt" in result.output
+```
+
+### Trailing Whitespace Stripping
+
+Off by default. Enable with `--cli-runner-strip-trailing-whitespace` or `cli_runner_strip_trailing_whitespace = true`.
+
+Typer renders help through a Rich panel, which pads every line out to the full terminal width. At a wide `--columns` setting that means lines of mostly blanks, which makes asserting on `--help` output impractical:
+
+```python
+def test_help(typer_runner):
+    result = typer_runner.invoke(app, ["--help"])
+
+    assert "Usage" in result.output
+    assert not any(line.endswith(" ") for line in result.output.split("\n"))
+```
+
+### Terminal Width
+
+Click's help formatter caps at 80 columns and ignores the `COLUMNS` environment variable, so the `--columns` setting alone never reached help text. When the column width feature is enabled, both fixtures pass it to `invoke()` as the `terminal_width` context setting. An explicit `terminal_width` argument always wins:
+
+```python
+def test_narrow_help(cli_runner):
+    result = cli_runner.invoke(main, ["--help"], terminal_width=40)
+```
+
+### Runners You Construct Yourself
+
+If runners come from your own conftest fixture and you would rather not switch to `cli_runner`, opt into patching instead. With `cli_runner_patch_result = true` or `--cli-runner-patch-result`, the same post-processing applies to every `Result` for the duration of each test, whoever built the runner:
+
+```toml
+[tool.pytest.ini_options]
+cli_runner_patch_result = true
+```
+
+Three caveats:
+
+- Terminal width injection does not reach externally built runners. Only the `cli_runner` and `typer_runner` fixtures' own `invoke()` passes `terminal_width` through; a runner you construct yourself keeps whatever width it would normally use.
+- Enabling patch mode changes what `cli_runner.invoke()` and `typer_runner.invoke()` return too: once the `Result` classes are patched, the fixtures' own `invoke()` skips its wrapping and returns the framework's `Result` directly instead of the proxy.
+- The patch is undone by `monkeypatch`, whose finalizer runs after every function-scoped fixture's teardown but before any session- or module-scoped one. A session- or module-scoped fixture that reads a `Result` during its own teardown therefore sees the raw, unprocessed output.
+
 ## Visible Whitespace in Assertions
 
 When two strings differ only in whitespace, pytest's default diff is hard to read. This plugin replaces invisible characters with visible Unicode symbols in the assertion failure message.
@@ -289,6 +400,10 @@ Every feature is configurable through CLI flags and `pyproject.toml` INI options
 | `tmp_path` in `capsys` | Off                   | `--capsys-strip-tmp-path` or `capsys_strip_tmp_path = true`       |
 | Visible whitespace     | On                    | `--no-show-whitespace` or `show_whitespace = false`               |
 | Column width           | Off                   | `--columns=N` or `set_columns = true`                             |
+| CLI runner ANSI        | On                    | Shares `--no-strip-ansi` / `strip_ansi = false`                    |
+| `tmp_path` in runner   | Off                   | `--cli-runner-strip-tmp-path` or `cli_runner_strip_tmp_path = true` |
+| Runner trailing space  | Off                   | `--cli-runner-strip-trailing-whitespace` or `cli_runner_strip_trailing_whitespace = true` |
+| Patch external runners | Off                   | `--cli-runner-patch-result` or `cli_runner_patch_result = true`     |
 
 ## AI Policy
 
