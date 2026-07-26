@@ -8,50 +8,19 @@ output simpler and more reliable.
 from __future__ import annotations
 
 import contextlib
-import re
 from typing import TYPE_CHECKING, Any
 
 import pytest
 from _pytest.capture import CaptureFixture, CaptureResult
 
-from devtools._options import resolve_option
+from devtools._options import resolve_option, should_strip_ansi
+from devtools._text import strip_ansi as strip_ansi  # noqa: PLC0414
+from devtools._text import strip_tmp_path as strip_tmp_path  # noqa: PLC0414
 
 if TYPE_CHECKING:
     from pathlib import Path
 
     from _pytest.config import Config
-
-ANSI_PATTERN = re.compile(r"\x1b\[[0-9;]*m")
-
-
-def strip_ansi(text: str) -> str:
-    """Remove ANSI escape sequences from a string.
-
-    Args:
-        text: The string potentially containing ANSI escape sequences.
-
-    Returns:
-        The string with all ANSI SGR sequences removed.
-    """
-    return ANSI_PATTERN.sub("", text)
-
-
-def strip_tmp_path(text: str, tmp_path: Path) -> str:
-    """Remove tmp_path prefix occurrences from a string.
-
-    Strip both ``str(tmp_path) + "/"`` and bare ``str(tmp_path)`` so that paths
-    nested under ``tmp_path`` collapse to their relative portion (matching the
-    behavior of the ``debug`` fixture's tmp_path stripping).
-
-    Args:
-        text: The captured output string.
-        tmp_path: The pytest ``tmp_path`` fixture value to strip.
-
-    Returns:
-        The string with tmp_path prefixes removed.
-    """
-    tmp_str = str(tmp_path)
-    return text.replace(f"{tmp_str}/", "").replace(tmp_str, "")
 
 
 def add_options(parser: pytest.Parser) -> None:
@@ -102,26 +71,8 @@ def configure(config: Config) -> None:
     """
     config.addinivalue_line(
         "markers",
-        "keep_ansi: disable ANSI stripping from capsys for this test",
+        "keep_ansi: disable ANSI stripping for this test",
     )
-
-
-def _should_strip_ansi(request: pytest.FixtureRequest) -> bool:
-    """Determine whether ANSI stripping should be applied for this test.
-
-    Args:
-        request: The pytest fixture request object.
-
-    Returns:
-        True if ANSI codes should be stripped, False otherwise.
-    """
-    if request.config.getoption("no_strip_ansi", default=False):
-        return False
-
-    if not request.config.getini("strip_ansi"):
-        return False
-
-    return not request.node.get_closest_marker("keep_ansi")
 
 
 class StrippedCaptureFixture:
@@ -187,7 +138,7 @@ def capsys(
     Returns:
         Either the original capsys or a wrapped version that post-processes output.
     """
-    ansi = _should_strip_ansi(request)
+    ansi = should_strip_ansi(request)
     tmp_path = bool(resolve_option(request, "capsys_strip_tmp_path"))
 
     if not ansi and not tmp_path:

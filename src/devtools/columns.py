@@ -43,7 +43,7 @@ def add_options(parser: pytest.Parser) -> None:
     )
 
 
-def _get_columns_value(config: Config) -> int | None:
+def get_columns_value(config: Config) -> int | None:
     """Determine the COLUMNS value from CLI and ini options.
 
     Args:
@@ -71,6 +71,6 @@ def _set_columns(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
         request: The pytest fixture request object.
         monkeypatch: The pytest monkeypatch fixture.
     """
-    columns = _get_columns_value(request.config)
+    columns = get_columns_value(request.config)
     if columns is not None:
         monkeypatch.setenv("COLUMNS", str(columns))
