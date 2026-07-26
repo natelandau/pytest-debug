@@ -10,8 +10,8 @@
         "Programming Language :: Python :: 3.14",
         "Topic :: Software Development :: Testing",
     ]
-    dependencies = ["pytest>=9.0.3", "rich>=15.0.0"]
-    description = "Pytest plugin providing debug fixtures, ANSI-stripped capsys, whitespace-visible assertions, and terminal column management."
+    dependencies = ["pytest>=7", "rich>=15.0.0"]
+    description = "Pytest plugin providing debug fixtures, ANSI-stripped capsys, whitespace-visible assertions, terminal column management, and click/typer CLI runner fixtures."
     license = { file = "LICENSE" }
     name = "pytest-devtools"
     readme = "README.md"
@@ -20,6 +20,10 @@
 
     [project.entry-points.pytest11]
         pytest-devtools = "devtools.plugin"
+
+[project.optional-dependencies]
+    click = ["click>=8.2"]
+    typer = ["typer>=0.25"]
 
 [build-system]
     build-backend = "uv_build"
@@ -30,6 +34,7 @@
 
 [dependency-groups]
     dev = [
+        "click>=8.2",
         "commitizen>=4.16.3",
         "coverage>=7.14.1",
         "duty>=1.9.0",
@@ -40,6 +45,7 @@
         "pytest-repeat>=0.9.4",
         "ruff>=0.15.16",
         "ty>=0.0.44",
+        "typer>=0.25",
         "typos>=1.47.2",
         "yamllint>=1.38.0",
     ]
