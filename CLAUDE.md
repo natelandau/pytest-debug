@@ -2,7 +2,7 @@
 
 ## Overview
 
-A pytest plugin (`pytest-devtools` on PyPI) providing four features: a Rich-powered debug fixture, ANSI-stripped capsys, visible whitespace in assertion diffs, and terminal column width management. Discovered automatically via the `pytest11` entry point.
+A pytest plugin (`pytest-devtools` on PyPI) providing five features: a Rich-powered debug fixture, ANSI-stripped capsys, visible whitespace in assertion diffs, terminal column width management, and post-processed `click`/`typer` CLI runner fixtures. Discovered automatically via the `pytest11` entry point.
 
 ## Commands
 
@@ -20,7 +20,7 @@ uv run pytest tests/ # Run tests
 -   **Package name:** `pytest-devtools` (PyPI) / `devtools` (import name)
 -   **Source layout:** `src/devtools/` with `uv_build` backend and `module-name = "devtools"`
 -   **Entry point:** `[project.entry-points.pytest11] pytest-devtools = "devtools.plugin"`
--   **Python:** >=3.10 | **Dependencies:** pytest>=7, rich>=15.0.0
+-   **Python:** >=3.10 | **Dependencies:** pytest>=7, rich>=15.0.0 | **Optional extras:** `click` (click>=8.2), `typer` (typer>=0.25)
 
 ### Module Structure
 
@@ -31,26 +31,39 @@ uv run pytest tests/ # Run tests
 | `capsys_strip.py`  | `capsys` fixture override, `StrippedCaptureFixture` wrapper, `keep_ansi` marker registration                |
 | `columns.py`       | `_set_columns` autouse fixture, `COLUMNS` env var management                                                |
 | `whitespace.py`    | `make_whitespace_visible()`, `pytest_assertrepr_compare` hook logic                                         |
+| `cli_runners.py`   | `cli_runner` and `typer_runner` fixtures, `StrippedResult`, opt-in `Result` patching        |
+| `_text.py`         | Pure text transforms shared by `capsys_strip.py` and `cli_runners.py`                       |
+| `_options.py`      | `resolve_option()` and `should_strip_ansi()` shared by `debug_fixture.py`, `capsys_strip.py`, `cli_runners.py` |
 
 ### Key Design Patterns
 
 -   **plugin.py is the single hook entry point.** Feature modules define `add_options()` functions and fixture/hook logic, but `plugin.py` calls them. Don't define pytest hooks directly in feature modules.
 -   **Fixtures are re-exported from plugin.py** using the `from module import fixture as fixture # noqa: PLC0414` pattern to make them discoverable by pytest.
 -   **`pytest_runtest_makereport`** uses `wrapper=True, tryfirst=True` to store phase reports in `item.stash` via `phase_report_key`. The `debug` fixture reads this during teardown to decide whether to flush output.
--   **Option resolution** follows precedence: per-call override > CLI flag > INI option > built-in default. See `_resolve_option()` in `debug_fixture.py`.
+-   **Option resolution** follows precedence: per-call override > CLI flag > INI option > built-in default. See `resolve_option()` in `_options.py`.
 
 ## Testing
 
 -   All tests use the **pytester** fixture (subprocess-based pytest plugin testing). The `conftest.py` loads it via `pytest_plugins = ["pytester"]`.
--   Tests run pytester subprocesses which get their own plugin instance. Be aware that **environment variables from the parent process leak into pytester subprocesses** - use `monkeypatch` to control the environment when testing features that read env vars (see `test_columns_disabled`).
+-   Tests run pytester subprocesses which get their own plugin instance. Be aware that **environment variables from the parent process leak into pytester subprocesses** - use `monkeypatch` to control the environment when testing features that read env vars (see `test_columns_not_set_by_default`).
 -   On **macOS**, `tmp_path` resolves to `/var/folders/.../T/`, not `/tmp/`. Don't assert on path strings containing "tmp" - use structural assertions instead.
--   **Pytest version floor is 7.0.** `pytest_runtest_makereport` uses pluggy's `wrapper=True` hookimpl, which needs pluggy >=1.4 — pytest 7+ resolves to a compatible pluggy transitively. CI's `reusable-tests.yml` matrix exercises pytest 7.x and 8.x in addition to the dev pin to catch regressions in this floor.
+-   **Pytest version floor is 7.0.** `pytest_runtest_makereport` uses pluggy's `wrapper=True` hookimpl, which needs pluggy >=1.4; pytest 7+ resolves to a compatible pluggy transitively. CI's `reusable-tests.yml` matrix exercises pytest 7.x and 8.x in addition to the dev pin to catch regressions in this floor.
 
 ## Gotchas and Lessons Learned
 
 -   **Generator return types for `ty`:** Fixtures using `yield` must annotate return type as `Generator[YieldType, None, None]`, not the yielded type directly. Hook wrappers using `yield` need `Generator[None, SendType, ReturnType]`. The `ty` type checker enforces this.
 -   **`TYPE_CHECKING` imports:** Ruff rule TC003 requires `collections.abc.Generator` and similar stdlib imports to be inside `if TYPE_CHECKING:` blocks when `from __future__ import annotations` is present.
 -   **Unused hook parameters:** The `call` parameter in `pytest_runtest_makereport` is required by the hook signature but unused - suppress with `# noqa: ARG001`.
--   **Boolean positional args:** `_resolve_option` accepts `bool | int | None` as a positional param - suppress ruff FBT001 with `# noqa: FBT001`.
+-   **Boolean positional args:** `resolve_option()` in `_options.py` accepts `bool | int | None` as a positional param - suppress ruff FBT001 with `# noqa: FBT001`.
 -   **`contextlib.suppress` over try/except/pass:** Ruff SIM105 prefers `with contextlib.suppress(ExceptionType):` over empty except blocks.
 -   **Pre-commit hooks:** All hook commands must use `uv run` prefix (e.g., `uv run pytest tests/`, `uv run ty check src/`) since tools are in the virtualenv. See `.pre-commit-config.yaml`.
+-   **typer 0.26 vendors click.** Before 0.26, `typer.testing.Result` **is** `click.testing.Result` and typer's runner subclasses click's. From 0.26 typer vendors click as `typer._click`, declares no click dependency, and `typer.testing.Result` is a distinct class. Anything patching `Result` must handle both targets and de-duplicate by identity. Subclassing `typer.testing.CliRunner` works across both eras.
+-   **The typer floor is 0.25, forced by the click floor of 8.2.** typer 0.15.x declares `click<8.2,>=8.0.0`; several other pre-0.25 versions declare only `click>=8.0.0` and so permit a click without `output_bytes`.
+-   **The optional extras do not enforce the version floors.** The fixtures activate on an `importlib.util.find_spec` probe, and any project testing a CLI already depends on click or typer directly, so `pytest-devtools[click]` installs nothing new and is easy to skip. `_check_min_version()` in `cli_runners.py` enforces the floor at fixture setup instead. Below the floor the failure is partial and misleading: `.output` silently mixes both streams and `.stderr` raises `ValueError: stderr not separately captured`.
+-   **Version comparisons use `packaging.version.Version`.** pytest declares `packaging>=22`, so it is always importable. Do not hand-roll string comparison; `"8.10" < "8.2"` is true as strings and false as versions.
+-   **`CliRunner` bypasses `capsys` entirely.** `invoke()` replaces `sys.stdout`/`sys.stderr` with its own buffers, so `capsys.readouterr()` returns empty strings for anything a runner produced. Post-process the `Result` instead.
+-   **Rich needs `force_terminal=True` in runner tests.** A bare `Console()` inside a runner detects a non-tty and emits no escape codes, so an ANSI test written without it passes vacuously.
+-   **`fnmatch_lines` treats `[...]` as a character class.** Asserting on a message containing `pytest-devtools[click]` needs a bracket-free pattern or `re_match_lines`.
+-   **`functools.cache` on anything holding a framework class is unsafe in pytester tests.** `pytester` restores a `sys.modules` snapshot, so a later inner run re-imports the framework fresh. A cached class then holds a base from the evicted copy, and cross-module-copy `isinstance` checks fail. Neither `_click_runner_class()` nor `_typer_runner_class()` is cached. For click the failure is that the runner builds a `Result` from the stale copy while patch mode patches the fresh `click.testing.Result`, so all post-processing silently disappears. For typer it is that `invoke()` re-derives its command through `get_command()`, whose `isinstance(value, DefaultPlaceholder)` checks then fail and leak an unresolved placeholder through as real data.
+-   **pytester's `sys.modules` snapshot does not undo attribute mutation on an already-imported module.** A generated `conftest.py` that patches a plugin module attribute at module level leaks that patch into the outer session permanently, breaking every later test that depends on the real value. Generated conftests must capture the original and restore it, for example with a session-scoped autouse fixture.
+-   **`uv run` re-syncs from the lockfile and silently reverts a manual `uv pip install` pin.** Any by-hand compatibility check against a pinned dependency version must set `UV_NO_SYNC=1`, or it tests the locked version while appearing to test the pinned one. CI's test step already sets this.

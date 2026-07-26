@@ -36,3 +36,24 @@ def resolve_option(
         return cli_value
 
     return request.config.getini(name)
+
+
+def should_strip_ansi(request: pytest.FixtureRequest) -> bool:
+    """Determine whether ANSI stripping applies to this test.
+
+    Shared by the capsys override and the CLI runner fixtures so a single set of
+    controls governs both.
+
+    Args:
+        request: The pytest fixture request object.
+
+    Returns:
+        True if ANSI codes should be stripped, False otherwise.
+    """
+    if request.config.getoption("no_strip_ansi", default=False):
+        return False
+
+    if not request.config.getini("strip_ansi"):
+        return False
+
+    return not request.node.get_closest_marker("keep_ansi")
